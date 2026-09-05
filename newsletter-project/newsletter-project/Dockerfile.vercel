@@ -1,0 +1,19 @@
+# Dockerfile.vercel
+# Builds a self-contained PHP + web server image using FrankenPHP.
+# Vercel runs this as a container-backed Function (no PHP support otherwise).
+
+FROM composer:2 AS dependencies
+WORKDIR /app
+COPY composer.json ./
+RUN composer install --no-dev --no-interaction --no-progress --optimize-autoloader
+
+FROM dunglas/frankenphp:1-php8.4-alpine
+WORKDIR /app
+COPY --from=dependencies /app/vendor ./vendor
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY public ./public
+# If you're using Aiven's required TLS certificate, uncomment the next line
+# after downloading ca.pem into a local certs/ folder (see README-DEPLOY.md):
+# COPY certs ./certs
+ENV PORT=80
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
