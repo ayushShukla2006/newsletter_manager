@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Write - Inkwell</title>
+<link rel="stylesheet" href="style.css">
+<script src="app.js"></script>
+</head>
+<body>
+<header class="nav" id="nav"></header>
+<main class="narrow">
+    <form id="writeForm">
+        <input type="text" id="title" placeholder="Title" style="font-family:Georgia,serif;font-size:1.8rem;border:0;border-bottom:1px solid #ddd;border-radius:0" required>
+        <textarea id="body" rows="18" placeholder="Tell your story. Leave a blank line between paragraphs." required></textarea>
+        <button class="btn" type="submit" id="publishBtn">Publish</button>
+        <a class="btn outline" href="dashboard.html">Cancel</a>
+        <p class="msg" id="msg"></p>
+    </form>
+</main>
+<script>
+const editId = new URLSearchParams(location.search).get('id'); // present when editing
+const msg = document.getElementById('msg');
+
+(async () => {
+    const user = await loadNav();
+    if (!user || user.role !== 'admin') { location.href = 'login.html'; return; }
+    if (editId) {
+        const data = await api('api/articles.php?id=' + encodeURIComponent(editId));
+        if (data.success) {
+            document.getElementById('title').value = data.article.title;
+            document.getElementById('body').value = data.article.body;
+            document.getElementById('publishBtn').textContent = 'Save changes';
+        }
+    }
+})();
+
+document.getElementById('writeForm').onsubmit = async e => {
+    e.preventDefault();
+    const r = await post('api/articles.php', {
+        id: editId,
+        title: document.getElementById('title').value,
+        body: document.getElementById('body').value
+    });
+    if (!r.success) { msg.className = 'msg error'; msg.textContent = r.message; return; }
+
+    msg.className = 'msg ok';
+    msg.innerHTML = editId
+        ? 'Saved. <a href="dashboard.html"><u>Back to dashboard</u></a>'
+        : `Published. ${r.notified} subscriber(s) would be emailed (simulated). <a href="dashboard.html"><u>Back to dashboard</u></a>`;
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard - Inkwell</title>
+<link rel="stylesheet" href="style.css">
+<script src="app.js"></script>
+</head>
+<body>
+<header class="nav" id="nav"></header>
+<main class="narrow">
+    <h1>Your dashboard</h1>
+    <div class="stats">
+        <div><b id="articleCount">0</b><span class="muted">articles</span></div>
+        <div><b id="subCount">0</b><span class="muted">subscribers</span></div>
+    </div>
+    <a class="btn" href="write.html">Write a new article</a>
+
+    <h2 style="margin-top:40px">Your articles</h2>
+    <table>
+        <thead><tr><th>Title</th><th>Published</th><th></th></tr></thead>
+        <tbody id="articleRows"></tbody>
+    </table>
+
+    <h2>Your subscribers</h2>
+    <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Since</th></tr></thead>
+        <tbody id="subRows"></tbody>
+    </table>
+</main>
+<script>
+async function loadArticles() {
+    const { articles } = await api('api/articles.php?mine=1');
+    document.getElementById('articleCount').textContent = articles.length;
+    document.getElementById('articleRows').innerHTML = articles.length ? articles.map(a => `
+        <tr>
+            <td><a href="article.html?id=${a.id}"><u>${esc(a.title)}</u></a></td>
+            <td>${fmtDate(a.created_at)}</td>
+            <td>
+                <a class="btn small outline" href="write.html?id=${a.id}">Edit</a>
+                <button class="btn small danger" data-id="${a.id}">Delete</button>
+            </td>
+        </tr>`).join('') : '<tr><td colspan="3">You have not published anything yet.</td></tr>';
+
+    document.querySelectorAll('button[data-id]').forEach(btn => {
+        btn.onclick = async () => {
+            if (!confirm('Delete this article?')) return;
+            await api('api/articles.php?id=' + btn.dataset.id, { method: 'DELETE' });
+            loadArticles();
+        };
+    });
+}
+
+async function loadSubscribers() {
+    const { subscribers } = await api('api/subscriptions.php');
+    document.getElementById('subCount').textContent = subscribers.length;
+    document.getElementById('subRows').innerHTML = subscribers.length ? subscribers.map(s => `
+        <tr><td>${esc(s.name)}</td><td>${esc(s.email)}</td><td>${fmtDate(s.created_at)}</td></tr>`).join('')
+        : '<tr><td colspan="3">No subscribers yet.</td></tr>';
+}
+
+(async () => {
+    const user = await loadNav();
+    if (!user || user.role !== 'admin') { location.href = 'login.html'; return; }
+    loadArticles();
+    loadSubscribers();
+})();
+</script>
+</body>
+</html>

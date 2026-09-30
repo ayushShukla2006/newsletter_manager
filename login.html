@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in - Inkwell</title>
+<link rel="stylesheet" href="style.css">
+<script src="app.js"></script>
+</head>
+<body>
+<header class="nav" id="nav"></header>
+<main class="narrow" style="max-width:420px">
+
+    <form id="loginForm">
+        <h1>Log in</h1>
+        <label for="lEmail">Email</label>
+        <input type="email" id="lEmail" required>
+        <label for="lPass">Password</label>
+        <input type="password" id="lPass" required>
+        <button class="btn" type="submit">Log in</button>
+        <p class="muted">New here? <a href="#" id="showRegister"><u>Create an account</u></a></p>
+    </form>
+
+    <form id="regForm" hidden>
+        <h1>Create account</h1>
+        <label for="rName">Name</label>
+        <input type="text" id="rName" required>
+        <label for="rEmail">Email</label>
+        <input type="email" id="rEmail" required>
+        <label for="rPass">Password (6+ characters)</label>
+        <input type="password" id="rPass" required>
+        <label class="check"><input type="checkbox" id="rWriter"> I want to write articles</label>
+        <div id="bioBox" hidden>
+            <label for="rBio">Short bio (shown next to your name)</label>
+            <input type="text" id="rBio" maxlength="255">
+        </div>
+        <button class="btn" type="submit">Sign up</button>
+        <p class="muted">Already have an account? <a href="#" id="showLogin"><u>Log in</u></a></p>
+    </form>
+
+    <p class="msg error" id="error"></p>
+</main>
+<script>
+loadNav();
+const loginForm = document.getElementById('loginForm');
+const regForm = document.getElementById('regForm');
+const errorBox = document.getElementById('error');
+
+document.getElementById('showRegister').onclick = e => { e.preventDefault(); loginForm.hidden = true; regForm.hidden = false; errorBox.textContent = ''; };
+document.getElementById('showLogin').onclick = e => { e.preventDefault(); regForm.hidden = true; loginForm.hidden = false; errorBox.textContent = ''; };
+document.getElementById('rWriter').onchange = e => { document.getElementById('bioBox').hidden = !e.target.checked; };
+
+// After login/signup, writers go to the dashboard and readers to their feed.
+function goHome(role) { location.href = role === 'admin' ? 'dashboard.html' : 'feed.html'; }
+
+loginForm.onsubmit = async e => {
+    e.preventDefault();
+    const r = await post('api/auth.php?action=login', {
+        email: document.getElementById('lEmail').value,
+        password: document.getElementById('lPass').value
+    });
+    r.success ? goHome(r.role) : errorBox.textContent = r.message;
+};
+
+regForm.onsubmit = async e => {
+    e.preventDefault();
+    const isWriter = document.getElementById('rWriter').checked;
+    const r = await post('api/auth.php?action=register', {
+        name: document.getElementById('rName').value,
+        email: document.getElementById('rEmail').value,
+        password: document.getElementById('rPass').value,
+        role: isWriter ? 'admin' : 'user',
+        bio: document.getElementById('rBio').value
+    });
+    r.success ? goHome(r.role) : errorBox.textContent = r.message;
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Article - Inkwell</title>
+<link rel="stylesheet" href="style.css">
+<script src="app.js"></script>
+</head>
+<body>
+<header class="nav" id="nav"></header>
+<main class="narrow">
+    <div id="article"></div>
+</main>
+<script>
+(async () => {
+    await loadNav();
+    const id = new URLSearchParams(location.search).get('id');
+    const data = await api('api/articles.php?id=' + encodeURIComponent(id));
+    const box = document.getElementById('article');
+    if (!data.success) { box.innerHTML = '<p>Article not found.</p>'; return; }
+    const a = data.article;
+    document.title = a.title + ' - Inkwell';
+    box.innerHTML = `<h1>${esc(a.title)}</h1>
+        <p class="muted">${esc(a.author)} on ${fmtDate(a.created_at)}</p>
+        <div class="article-body">${paragraphs(a.body)}</div>`;
+})();
+</script>
+</body>
+</html>

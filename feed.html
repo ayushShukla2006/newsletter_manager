@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My feed - Inkwell</title>
+<link rel="stylesheet" href="style.css">
+<script src="app.js"></script>
+</head>
+<body>
+<header class="nav" id="nav"></header>
+<main>
+    <section>
+        <h1>My feed</h1>
+        <p class="muted">Articles from writers you subscribe to</p>
+        <div id="articles"></div>
+    </section>
+    <aside id="writers"></aside>
+</main>
+<script>
+async function loadFeed() {
+    const { articles } = await api('api/articles.php?feed=1');
+    document.getElementById('articles').innerHTML = articles.length
+        ? articles.map(articleCard).join('')
+        : '<p>Nothing here yet. Subscribe to a writer on the right, or browse <a href="index.html"><u>all articles</u></a>.</p>';
+}
+(async () => {
+    const user = await loadNav();
+    if (!user) { location.href = 'login.html'; return; }
+    window.onSubscriptionChange = loadFeed; // refresh the feed when a subscription changes
+    loadWriters(document.getElementById('writers'), user);
+    loadFeed();
+})();
+</script>
+</body>
+</html>
