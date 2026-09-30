@@ -7,7 +7,7 @@ $port     = getenv('DB_PORT') ?: '3306';
 $dbname   = getenv('DB_NAME') ?: 'newsletter_db';
 $username = getenv('DB_USER') ?: 'root';
 $password = getenv('DB_PASSWORD') ?: '';
-$sslCa    = getenv('DB_SSL_CA') ?: null;
+   $sslCa = getenv('DB_SSL_CA') ? __DIR__ . '/../' . getenv('DB_SSL_CA') : null;
 
 try {
     $options = [
