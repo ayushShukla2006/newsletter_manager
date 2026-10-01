@@ -29,6 +29,7 @@ async function loadNav() {
     let links = '<a href="index.html">Home</a>';
     if (user && user.role === 'admin') links += '<a href="dashboard.html">Dashboard</a>';
     if (user && user.role === 'user')  links += '<a href="feed.html">My feed</a>';
+    if (user) links += '<a href="profile.html">Profile</a>';
     links += user
         ? `<button id="logoutBtn">Log out (${esc(user.name)})</button>`
         : '<a href="login.html">Log in</a>';

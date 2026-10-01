@@ -13,6 +13,17 @@ $d = input();
 $email = strtolower(trim($d['email'] ?? ''));
 $pass  = $d['password'] ?? '';
 
+if ($action === 'update_profile') {
+    $me   = require_login();
+    $name = trim($d['name'] ?? '');
+    $bio  = substr(trim($d['bio'] ?? ''), 0, 255);
+    if ($name === '') json_out(['success' => false, 'message' => 'Name is required.'], 422);
+
+    $st = $pdo->prepare('UPDATE users SET name = ?, bio = ? WHERE id = ?');
+    $st->execute([$name, $bio, $me['id']]);
+    json_out(['success' => true]);
+}
+
 if ($action === 'register') {
     $name = trim($d['name'] ?? '');
     $role = ($d['role'] ?? '') === 'admin' ? 'admin' : 'user';

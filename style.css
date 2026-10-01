@@ -363,7 +363,8 @@ main.narrow[style] {
 }
 
 #loginForm,
-#regForm {
+#regForm,
+#profileForm  {
     padding: 34px;
     border: 1px solid var(--line);
     border-radius: 16px;
@@ -371,7 +372,8 @@ main.narrow[style] {
 }
 
 #loginForm h1,
-#regForm h1 {
+#regForm,
+#profileForm h1 h1 {
     margin-bottom: 28px;
     font-size: 2.25rem;
 }
@@ -588,7 +590,7 @@ td a:hover {
 }
 
 @media (max-width: 500px) {
-    .nav nav a:nth-child(2) {
+    .nav nav a:nth-child {
         display: none;
     }
 

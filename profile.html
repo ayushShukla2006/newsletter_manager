@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile - Inkwell</title>
+<link rel="stylesheet" href="style.css">
+<script src="app.js"></script>
+</head>
+<body>
+<header class="nav" id="nav"></header>
+<main class="narrow" style="max-width:420px">
+    <form id="profileForm">
+        <h1>Your profile</h1>
+        <label for="name">Name</label>
+        <input type="text" id="name" required>
+        <div id="bioBox" hidden>
+            <label for="bio">Bio (shown next to your name)</label>
+            <input type="text" id="bio" maxlength="255">
+        </div>
+        <button class="btn" type="submit">Save changes</button>
+        <p class="msg" id="msg"></p>
+    </form>
+</main>
+<script>
+const msg = document.getElementById('msg');
+let currentUser;
+
+(async () => {
+    currentUser = await loadNav();
+    if (!currentUser) { location.href = 'login.html'; return; }
+    document.getElementById('name').value = currentUser.name;
+    document.getElementById('bio').value = currentUser.bio || '';
+    document.getElementById('bioBox').hidden = currentUser.role !== 'admin';
+})();
+
+document.getElementById('profileForm').onsubmit = async e => {
+    e.preventDefault();
+    const r = await post('api/auth.php?action=update_profile', {
+        name: document.getElementById('name').value,
+        // readers have no bio field, so send back what they already have
+        bio: currentUser.role === 'admin' ? document.getElementById('bio').value : (currentUser.bio || '')
+    });
+    msg.className = r.success ? 'msg ok' : 'msg error';
+    msg.textContent = r.success ? 'Saved.' : r.message;
+    if (r.success) loadNav(); // refresh the name shown in the top bar
+};
+</script>
+</body>
+</html>
