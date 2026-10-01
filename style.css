@@ -202,30 +202,49 @@ h2 {
     padding-top: 7px;
 }
 
-#writers::before {
-    content: "WRITERS";
-    display: block;
-    margin-bottom: 12px;
-    color: #888;
-    font-size: .7rem;
-    font-weight: 700;
-    letter-spacing: .12em;
+#writers > h2 {
+    margin-bottom: 18px;
+    font-size: 1.15rem;
 }
 
 .writer {
-    padding: 15px 0;
-    border-bottom: 1px solid var(--line);
+    min-height: 190px;
+    display: flex;
+    flex-direction: column;
+    padding: 22px;
+    margin-bottom: 14px;
+    border: 1px solid #dedbd5;
+    border-radius: 13px;
+    background: var(--surface);
+    box-shadow: 0 5px 18px rgba(0, 0, 0, .035);
 }
 
 .writer strong {
     display: block;
-    margin-bottom: 2px;
-    font-size: .92rem;
+    margin-bottom: 5px;
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.12rem;
+    line-height: 1.25;
 }
 
 .writer .muted {
-    display: inline-block;
-    margin-bottom: 9px;
+    display: block;
+    margin: 0;
+    color: #737373;
+    font-size: .84rem;
+}
+
+.writer .muted:nth-of-type(2) {
+    margin-top: auto;
+    padding-top: 22px;
+    color: #555;
+    font-size: .78rem;
+}
+
+.writer .btn {
+    align-self: flex-start;
+    margin-top: 10px;
 }
 
 /* ---------- buttons ---------- */
