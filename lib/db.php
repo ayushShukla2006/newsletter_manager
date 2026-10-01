@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', '0'); // never print PHP warnings into the JSON
 // lib/db.php - database connection (same idea as before).
 // Local XAMPP: no env vars -> root / no password / localhost.
 // Vercel: set DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD (and DB_SSL_CA if your host needs TLS).
@@ -15,8 +16,9 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ];
     if ($sslCa) {
-        $options[PDO::MYSQL_ATTR_SSL_CA] = $sslCa;
-        $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
+        $isNew = class_exists('Pdo\Mysql'); // PHP 8.5+
+        $options[$isNew ? \Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA] = $sslCa;
+        $options[$isNew ? \Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
     }
     $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4", $username, $password, $options);
 } catch (PDOException $e) {
